@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Map Visualization - Generated 2025-07-25 00:45</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vis-network@latest/standalone/umd/vis-network.min.js"></script>
+    <style>
+        /* AI_EDIT_POINT: Modify styles here */
+        body {
+            background-color: #0F1419;
+            color: #E2E8F0;
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #1A202C;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #2D3748;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        h1 {
+            color: #F7FAFC;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #CBD5E0;
+            margin-top: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background-color: #2D3748;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #4A5568;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #B794F4;
+        }
+        
+        .tabs {
+            background-color: #2D3748;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            border-bottom: 3px solid #4A5568;
+        }
+        
+        .tab-button {
+            background: none;
+            color: #CBD5E0;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin: 0 5px;
+        }
+        
+        .tab-button:hover {
+            color: #F7FAFC;
+            background-color: #374151;
+        }
+        
+        .tab-button.active {
+            color: #F7FAFC;
+            background-color: #4A5568;
+            border-bottom: 3px solid #B794F4;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .visualization-container {
+            background-color: #1A202C;
+            border: 3px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1400px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        }
+        
+        h2 {
+            color: #F7FAFC;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        #treemap {
+            width: 100%;
+            height: 600px;
+            background-color: #1A202C;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #network {
+            width: 100%;
+            height: 700px;
+            background-color: #1A202C;
+            border-radius: 8px;
+        }
+        
+        button {
+            background: #B794F4;
+            color: #1A202C;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #D6B4FC;
+            transform: translateY(-2px);
+        }
+        
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            background: #2D3748;
+            color: #F7FAFC;
+            border: 2px solid #B794F4;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗂️ System Map Visualization</h1>
+        <p class="subtitle">Automated File System Analysis</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div>Total Size</div>
+                <div class="stat-value">0.1 GB</div>
+            </div>
+            <div class="stat-item">
+                <div>Total Files</div>
+                <div class="stat-value">153</div>
+            </div>
+            <div class="stat-item">
+                <div>Scan Date</div>
+                <div class="stat-value">2025-07-25 00:45</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('overview')">📊 Overview</button>
+        <button class="tab-button" onclick="showTab('treemap')">🗺️ Treemap</button>
+        <button class="tab-button" onclick="showTab('network')">🌐 Network</button>
+    </div>
+    
+    <!-- Overview Tab -->
+    <div id="overview" class="tab-content active">
+        <div class="visualization-container">
+            <h2>💾 Storage Distribution by Category</h2>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="visualization-container">
+            <h2>📈 Top Directories by Size</h2>
+            <div class="chart-container">
+                <canvas id="topDirsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Treemap Tab -->
+    <div id="treemap-tab" class="tab-content">
+        <div class="visualization-container">
+            <h2>📊 Interactive File System Treemap</h2>
+            <div class="controls">
+                <button onclick="updateView('size')">View by Size</button>
+                <button onclick="updateView('count')">View by File Count</button>
+                <button onclick="zoomOut()">Reset Zoom</button>
+            </div>
+            <div id="treemap"></div>
+            <div class="tooltip"></div>
+        </div>
+    </div>
+    
+    <!-- Network Tab -->
+    <div id="network-tab" class="tab-content">
+        <div class="visualization-container">
+            <h2>🌐 Directory Network Visualization</h2>
+            <div id="network"></div>
+        </div>
+    </div>
+
+    <script>
+        // Embedded data
+        const categoriesData = {"other": {"size": 79.79276180267334, "count": 166, "color": "#718096"}, "config": {"size": 0.16312313079833984, "count": 5, "color": "#F6AD55"}};
+        const topDirsData = [{"name": "Desktop", "size": 79.48075294494629, "category": "other", "color": "#718096"}, {"name": "life-database", "size": 0.3120088577270508, "category": "other", "color": "#718096"}, {"name": "o3_LDB.rtfd", "size": 0.16312313079833984, "category": "config", "color": "#F6AD55"}];
+        const treeData = {"name": "Desktop", "value": 79.48075294494629, "count": 153, "color": "#718096", "children": [{"name": "life-database", "value": 0.3120088577270508, "count": 13, "color": "#718096", "children": [{"name": "o3_LDB.rtfd", "value": 0.16312313079833984, "count": 5, "color": "#F6AD55", "children": []}]}]};
+        const networkData = {"nodes": [{"id": 0, "label": "Desktop\\n79MB", "size": 20, "color": "#718096", "level": 0}, {"id": 1, "label": "life-database\\n0MB", "size": 20, "color": "#718096", "level": 1}, {"id": 2, "label": "o3_LDB.rtfd\\n0MB", "size": 20, "color": "#F6AD55", "level": 2}], "edges": [{"from": 0, "to": 1, "width": 1}, {"from": 1, "to": 2, "width": 1}]};
+        
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            if (tabName === 'overview') {
+                document.getElementById('overview').classList.add('active');
+                initCharts();
+            } else if (tabName === 'treemap') {
+                document.getElementById('treemap-tab').classList.add('active');
+                initTreemap();
+            } else if (tabName === 'network') {
+                document.getElementById('network-tab').classList.add('active');
+                initNetwork();
+            }
+            
+            event.target.classList.add('active');
+        }
+        
+        // Initialize charts
+        let chartsInitialized = false;
+        function initCharts() {
+            if (chartsInitialized) return;
+            chartsInitialized = true;
+            
+            // Category pie chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryLabels = Object.keys(categoriesData).map(k => 
+                k + ' (' + (categoriesData[k].size / 1000).toFixed(1) + ' GB)'
+            );
+            const categoryValues = Object.keys(categoriesData).map(k => categoriesData[k].size);
+            const categoryColors = Object.keys(categoriesData).map(k => categoriesData[k].color);
+            
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryValues,
+                        backgroundColor: categoryColors,
+                        borderColor: '#1A202C',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#E2E8F0',
+                                font: { size: 14 }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Top directories bar chart
+            const topDirsCtx = document.getElementById('topDirsChart').getContext('2d');
+            new Chart(topDirsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topDirsData.map(d => d.name),
+                    datasets: [{
+                        label: 'Size in MB',
+                        data: topDirsData.map(d => d.size),
+                        backgroundColor: topDirsData.map(d => d.color),
+                        borderColor: '#2D3748',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#2D3748' },
+                            ticks: { color: '#E2E8F0' }
+                        },
+                        x: {
+                            grid: { color: '#2D3748' },
+                            ticks: { color: '#E2E8F0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        
+        // Treemap functionality
+        let treemapInitialized = false;
+        let currentView = 'size';
+        let g, tooltip;
+        
+        function initTreemap() {
+            if (treemapInitialized) return;
+            treemapInitialized = true;
+            
+            const width = document.getElementById('treemap').offsetWidth;
+            const height = 600;
+            
+            const svg = d3.select("#treemap")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+                
+            g = svg.append("g");
+            tooltip = d3.select(".tooltip");
+            
+            updateTreemap();
+        }
+        
+        function updateTreemap() {
+            const width = document.getElementById('treemap').offsetWidth;
+            const height = 600;
+            
+            const treemap = d3.treemap()
+                .size([width, height])
+                .padding(2)
+                .round(true);
+                
+            const root = d3.hierarchy(treeData)
+                .sum(d => currentView === 'size' ? d.value : d.count)
+                .sort((a, b) => b.value - a.value);
+                
+            treemap(root);
+            
+            const nodes = root.descendants();
+            
+            g.selectAll(".node").remove();
+            
+            const node = g.selectAll(".node")
+                .data(nodes)
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+                
+            node.append("rect")
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("fill", d => d.data.color || "#718096")
+                .attr("stroke", "#1A202C")
+                .attr("stroke-width", 1)
+                .style("cursor", d => d.children ? "pointer" : "default")
+                .on("click", (event, d) => {
+                    if (d.children) zoom(d);
+                })
+                .on("mouseover", (event, d) => {
+                    tooltip.transition().duration(200).style("opacity", .9);
+                    tooltip.html(`<strong>${d.data.name}</strong><br/>Size: ${formatSize(d.data.value)}<br/>Files: ${d.data.count || 'N/A'}`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.transition().duration(500).style("opacity", 0);
+                });
+                
+            node.append("text")
+                .attr("x", 5)
+                .attr("y", 20)
+                .text(d => {
+                    const width = d.x1 - d.x0;
+                    return width > 60 ? d.data.name : "";
+                })
+                .attr("font-size", "14px")
+                .attr("fill", "#F7FAFC")
+                .style("pointer-events", "none");
+        }
+        
+        function zoom(d) {
+            const width = document.getElementById('treemap').offsetWidth;
+            const height = 600;
+            
+            const x0 = d.x0, y0 = d.y0, x1 = d.x1, y1 = d.y1;
+            const xScale = width / (x1 - x0);
+            const yScale = height / (y1 - y0);
+            
+            g.transition()
+                .duration(750)
+                .attr("transform", `translate(${-x0 * xScale},${-y0 * yScale}) scale(${xScale},${yScale})`);
+        }
+        
+        function zoomOut() {
+            g.transition().duration(750).attr("transform", "translate(0,0) scale(1,1)");
+        }
+        
+        function updateView(metric) {
+            currentView = metric;
+            updateTreemap();
+        }
+        
+        function formatSize(mb) {
+            if (mb >= 1000) return (mb / 1000).toFixed(1) + " GB";
+            return mb + " MB";
+        }
+        
+        // Network functionality
+        let networkInitialized = false;
+        let network;
+        
+        function initNetwork() {
+            if (networkInitialized) return;
+            networkInitialized = true;
+            
+            const container = document.getElementById('network');
+            const data = {
+                nodes: new vis.DataSet(networkData.nodes),
+                edges: new vis.DataSet(networkData.edges)
+            };
+            
+            const options = {
+                nodes: {
+                    shape: 'circle',
+                    font: {
+                        color: '#F7FAFC',
+                        size: 14,
+                        face: 'Inter, system-ui, sans-serif'
+                    },
+                    borderWidth: 2,
+                    borderWidthSelected: 4,
+                    scaling: {
+                        min: 20,
+                        max: 50
+                    }
+                },
+                edges: {
+                    color: {
+                        color: '#4A5568',
+                        highlight: '#B794F4',
+                        hover: '#B794F4'
+                    },
+                    smooth: {
+                        type: 'continuous',
+                        roundness: 0.5
+                    }
+                },
+                physics: {
+                    forceAtlas2Based: {
+                        gravitationalConstant: -50,
+                        centralGravity: 0.005,
+                        springLength: 200,
+                        springConstant: 0.05,
+                        damping: 0.4
+                    },
+                    solver: 'forceAtlas2Based',
+                    stabilization: {
+                        iterations: 200
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200,
+                    hideEdgesOnDrag: true
+                }
+            };
+            
+            network = new vis.Network(container, data, options);
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            initCharts();
+        };
+    </script>
+</body>
+</html>
